@@ -1,0 +1,10 @@
+---
+- name: Create users
+  postgresql_user:
+    login_user: root
+    name: "{{ item.username }}"
+    role_attr_flags: "{{ none if item.role_attributes|default(none) == none else item.role_attributes.values()|join(',') }}"
+    password: "{{ item.password|default(none) }}"
+  loop_control:
+    label: "{{ item.username }}"
+  with_items: "{{ postgresql.users.values()|list }}"

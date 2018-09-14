@@ -1,0 +1,9 @@
+---
+- name: Enable service
+  lineinfile: path="{{ item.path }}" regexp="{{ item.regexp }}" line="{{ item.line }}"
+  loop_control:
+    label: "{{ item.path }}"
+  with_items:
+    - path: /etc/rc.conf
+      regexp: "^postgresql_enable="
+      line: 'postgresql_enable="YES"'

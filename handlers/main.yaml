@@ -1,0 +1,12 @@
+---
+- name: Start PostgreSQL
+  service:
+    name: postgresql
+    state: started
+  register: postgresql_service_result
+
+- name: Restart PostgreSQL
+  service:
+    name: postgresql
+    state: restarted
+  when: not (postgresql_service_result is defined and postgresql_service_result.changed)
