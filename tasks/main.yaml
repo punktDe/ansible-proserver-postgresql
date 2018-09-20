@@ -1,5 +1,4 @@
 ---
 - import_tasks: service.yaml
-- import_tasks: initialize.yaml
 - import_tasks: users.yaml
 - import_tasks: databases.yaml
