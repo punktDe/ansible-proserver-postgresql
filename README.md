@@ -5,7 +5,7 @@ Ansible role to configure PostgreSQL on a proServer.
 ## Requirements
 
 - A proServer
-- Ansible >=2.4.0
+- Ansible >=2.6.4
 - Ansible option `hash_behaviour` set to `merge`
 
 ## Configuration
