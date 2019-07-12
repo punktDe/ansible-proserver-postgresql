@@ -2,6 +2,7 @@
 postgresql:
   prefix:
     config: /usr/local/etc
+  users: {}
   databases: {}
   database_defaults:
     encoding: UTF-8
