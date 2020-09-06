@@ -20,3 +20,12 @@ postgresql:
       repository: |
         deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main
       package: postgresql-12
+  timescaledb:
+    enabled: no
+    autotune: yes
+    repository:
+      apt:
+        key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x55EE6BF7698E3D58D72C0DD9ECB3980CC59E610B
+        repository: |
+          deb http://ppa.launchpad.net/timescale/timescaledb-ppa/ubuntu {{ ansible_distribution_release }} main
+        package: timescaledb-postgresql-12
