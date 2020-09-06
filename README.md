@@ -18,7 +18,6 @@ git submodule add https://github.com/punktDe/proserver-ansible-postgresql.git ro
 ```
 
 ```yaml
----
 - name: postgresql
   hosts: all
   become: yes
@@ -29,7 +28,6 @@ git submodule add https://github.com/punktDe/proserver-ansible-postgresql.git ro
 **2)** Configure which databases and users you'd like to have (in host vars, group vars or wherever).
 
 ```yaml
----
 postgresql:
   databases:
     cms:
@@ -58,7 +56,6 @@ You can use those keys to override previously defined variables
 This example shows all available variables.
 
 ```yaml
----
 postgresql:
   database_defaults:
     encoding: UTF-8

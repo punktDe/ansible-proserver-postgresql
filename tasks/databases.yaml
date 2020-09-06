@@ -1,8 +1,7 @@
----
 - name: Create databases
   postgresql_db:
     login_user: root
-    maintenance_db: root
+    maintenance_db: postgres
     name: "{{ item.value.name }}"
     owner: "{{ owner }}"
     encoding: "{{ encoding }}"
@@ -34,7 +33,7 @@
     - name: Restore databases
       postgresql_db:
         login_user: root
-        maintenance_db: root
+        maintenance_db: postgres
         state: restore
         target: "{{ tmpfile }}"
         name: "{{ item.item.value.name }}"

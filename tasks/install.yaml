@@ -1,0 +1,37 @@
+- when: ansible_distribution == 'Ubuntu'
+  block:
+    - when: postgresql.repository.apt.repository
+      block:
+        - name: Add PostgreSQL repository key
+          apt_key:
+            url: "{{ postgresql.repository.apt.key_url }}"
+
+        - name: Add PostgreSQL repository
+          loop:
+            - /etc/apt/sources.list.d/postgresql.list
+          copy:
+            content: |
+              {{ postgresql.repository.apt.repository }}
+            dest: "{{ item }}"
+          register: postgresql_add_apt_repository
+
+        - name: Update apt cache
+          apt:
+            update_cache: yes
+          when: postgresql_add_apt_repository.changed
+
+    - name: Ensure data dir is mounted before PostgreSQL is started
+      loop:
+        - /etc/systemd/system/postgresql.service.d/UnitRequiresMountsFor.conf
+      ini_file:
+        path: "{{ item }}"
+        create: yes
+        section: Unit
+        option: RequiresMountsFor
+        value: /var/lib/postgresql
+
+    - name: Install PostgreSQL
+      apt:
+        name:
+          - "{{ postgresql.repository.apt.package }}"
+          - python3-psycopg2

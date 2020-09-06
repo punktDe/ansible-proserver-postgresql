@@ -1,7 +1,16 @@
----
+- name: Create root user
+  when: ansible_system == 'Linux'
+  become_user: postgres
+  postgresql_user:
+    login_user: postgres
+    db: postgres
+    name: root
+    role_attr_flags: SUPERUSER
+
 - name: Create users
   postgresql_user:
     login_user: root
+    db: postgres
     name: "{{ item.username }}"
     role_attr_flags: "{{ none if item.role_attributes|default(none) == none else item.role_attributes.values()|join(',') }}"
     password: "{{ item.password|default(none) }}"
