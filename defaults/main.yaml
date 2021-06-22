@@ -1,6 +1,11 @@
 postgresql:
   prefix:
-    config: /usr/local/etc
+    config: >-
+      {%- if ansible_system == 'Linux' -%}
+        /etc/postgresql/13
+      {%- else -%}
+        /usr/local/etc
+      {%- endif -%}
   users: {}
   databases:
     root:
@@ -14,6 +19,7 @@ postgresql:
   data_dir: /var/db/postgresql/data9
   init_command: /usr/local/etc/rc.d/postgresql initdb
   user: pgsql
+  postgresql.conf: {}
   repository:
     apt:
       key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
