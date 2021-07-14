@@ -31,4 +31,4 @@ postgresql:
         key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x55EE6BF7698E3D58D72C0DD9ECB3980CC59E610B
         repository: |
           deb http://ppa.launchpad.net/timescale/timescaledb-ppa/ubuntu {{ ansible_distribution_release }} main
-        package: timescaledb-postgresql-13
+        package: timescaledb-2-postgresql-13
