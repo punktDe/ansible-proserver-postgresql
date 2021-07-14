@@ -16,9 +16,6 @@ postgresql:
     lc_collate: en_US.UTF-8
     lc_ctype: en_US.UTF-8
     template: template0
-  data_dir: /var/db/postgresql/data9
-  init_command: /usr/local/etc/rc.d/postgresql initdb
-  user: pgsql
   postgresql.conf: {}
   repository:
     apt:
