@@ -35,3 +35,4 @@
         name:
           - "{{ postgresql.repository.apt.package }}"
           - python3-psycopg2
+          - acl
