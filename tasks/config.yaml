@@ -1,6 +1,6 @@
 - name: Template PostgreSQL config
   loop:
-    - "{{ postgresql.prefix.config }}/main/conf.d/ansible.conf"
+    - "{{ postgresql.prefix.config }}/ansible.conf"
   template:
     src: postgresql/postgresql.conf
     dest: "{{ item }}"

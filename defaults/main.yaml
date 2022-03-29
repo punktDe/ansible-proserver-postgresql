@@ -2,9 +2,11 @@ postgresql:
   prefix:
     config: >-
       {%- if ansible_system == 'Linux' -%}
-        /etc/postgresql/13
+        /etc/postgresql/13/main/conf.d
+      {%- elif ansible_system == 'FreeBSD' -%}
+       /var/db/postgresql/data13
       {%- else -%}
-        /usr/local/etc
+        /usr/local/etc/main/conf.d
       {%- endif -%}
   users: {}
   databases:
