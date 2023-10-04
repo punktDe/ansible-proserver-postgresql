@@ -17,3 +17,15 @@
   loop_control:
     label: "{{ item.username }}"
   with_items: "{{ postgresql.users.values()|list }}"
+
+- name: Assign privs
+  with_items: "{{ postgresql.privileges.values() | list }}"
+  community.postgresql.postgresql_privs:
+    objs: "{{ item.objs | default(omit) }}"
+    schema: "{{ item.schema | default(omit) }}"
+    database: "{{ item.database }}"
+    state: present
+    privs: "{{ item.privs | join(',') }}"
+    type: "{{ item.type | default('table') }}"
+    roles: "{{ item.username }}"
+    grant_option: true
