@@ -5,3 +5,8 @@
     src: postgresql/postgresql.conf
     dest: "{{ item }}"
   notify: Restart PostgreSQL
+
+- name: Include the custom PostgreSQL file
+  ansible.builtin.lineinfile:
+    path: "{{ postgresql.prefix.config }}/postgresql.conf"
+    line: "include_if_exists = 'ansible.conf'"

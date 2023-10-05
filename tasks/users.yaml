@@ -19,7 +19,7 @@
   with_items: "{{ postgresql.users.values()|list }}"
 
 - name: Assign privs
-  with_items: "{{ postgresql.privileges.values() | list }}"
+  loop: "{{ postgresql.privileges.values() | list }}"
   community.postgresql.postgresql_privs:
     objs: "{{ item.objs | default(omit) }}"
     schema: "{{ item.schema | default(omit) }}"
@@ -29,3 +29,24 @@
     type: "{{ item.type | default('table') }}"
     roles: "{{ item.username }}"
     grant_option: true
+
+- name: Add users to pg_hba.conf
+  loop: "{{ postgresql.users.values() | list }}"
+  vars:
+    hba_databases: >-
+      {{
+        postgresql.privileges.values() |
+        selectattr('username', 'equalto', item.username) |
+        map(attribute='database') |
+        unique |
+        list |
+        join(',')
+      }}
+  when: "hba_databases is not undefined and hba_databases | length > 0"
+  community.postgresql.postgresql_pg_hba:
+    dest: "{{ postgresql.prefix.config }}/pg_hba.conf"
+    contype: host
+    users: "{{ item.username }}"
+    source: "{{ item.host | default('::1') }}"
+    databases: "{{ hba_databases }}"
+    method: password
