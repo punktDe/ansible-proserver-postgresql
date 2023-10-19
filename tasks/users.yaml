@@ -31,12 +31,12 @@
     grant_option: true
 
 - name: Add users to pg_hba.conf
-  loop: "{{ postgresql.users.values() | list }}"
+  loop: "{{ postgresql.users.values() | list | subelements('hosts', skip_missing=True) }}"
   vars:
     hba_databases: >-
       {{
         postgresql.privileges.values() |
-        selectattr('username', 'equalto', item.username) |
+        selectattr('username', 'equalto', item[0].username) |
         map(attribute='database') |
         unique |
         list |
@@ -46,7 +46,7 @@
   community.postgresql.postgresql_pg_hba:
     dest: "{{ postgresql.prefix.config }}/pg_hba.conf"
     contype: host
-    users: "{{ item.username }}"
-    source: "{{ item.host | default('::1') }}"
+    users: "{{ item[0].username }}"
+    source: "{{ item[1] }}"
     databases: "{{ hba_databases }}"
     method: password
