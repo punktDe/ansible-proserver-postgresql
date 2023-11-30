@@ -1,9 +1,10 @@
+---
 - name: Template PostgreSQL config
-  loop:
-    - "{{ postgresql.prefix.config }}/ansible.conf"
-  template:
+  ansible.builtin.template:
+    owner: root
     src: postgresql/postgresql.conf
-    dest: "{{ item }}"
+    dest: "{{ postgresql.prefix.config }}/ansible.conf"
+    mode: "0644"
   notify: Restart PostgreSQL
 
 - name: Include the custom PostgreSQL file
