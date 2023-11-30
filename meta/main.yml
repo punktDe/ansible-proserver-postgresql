@@ -3,7 +3,7 @@ dependencies: []
 
 galaxy_info:
   author: "Punkt.de"
-  license: ""
+  license: "MIT"
   description: "Postgresql role for Proserver"
   role_name: "proserver_postgresql"
   namespace: "punktde"
