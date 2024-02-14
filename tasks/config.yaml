@@ -9,5 +9,8 @@
 
 - name: Include the custom PostgreSQL file
   ansible.builtin.lineinfile:
+    create: yes
+    owner: root
+    mode: "0644"
     path: "{{ postgresql.prefix.config }}/postgresql.conf"
     line: "include_if_exists = 'ansible.conf'"

@@ -31,7 +31,7 @@ postgresql:
     autotune: yes
     repository:
       apt:
-        key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x55EE6BF7698E3D58D72C0DD9ECB3980CC59E610B
+        key_url: https://packagecloud.io/timescale/timescaledb/gpgkey
         repository: |
-          deb http://ppa.launchpad.net/timescale/timescaledb-ppa/ubuntu {{ ansible_distribution_release }} main
+          deb https://packagecloud.io/timescale/timescaledb/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} main
         package: timescaledb-2-postgresql-13
