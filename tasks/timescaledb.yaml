@@ -1,24 +1,23 @@
 ---
 - name: Add TimescaleDB repository key
-  apt_key:
+  ansible.builtin.apt_key:
     url: "{{ postgresql.timescaledb.repository.apt.key_url }}"
 
 - name: Add TimescaleDB repository
-  loop:
-    - /etc/apt/sources.list.d/timescaledb.list
-  copy:
-    content: |
-      {{ postgresql.timescaledb.repository.apt.repository }}
-    dest: "{{ item }}"
+  ansible.builtin.copy:
+    content: "{{ postgresql.timescaledb.repository.apt.repository }}"
+    dest: "/etc/apt/sources.list.d/timescaledb.list"
+    owner: "root"
+    mode: "0644"
   register: postgresql_timescaledb_add_apt_repository
 
 - name: Update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
   when: postgresql_timescaledb_add_apt_repository.changed
 
 - name: Install TimescaleDB
-  apt:
+  ansible.builtin.apt:
     name:
       - "{{ postgresql.timescaledb.repository.apt.package }}"
       - timescaledb-tools
@@ -26,5 +25,7 @@
 
 - name: Tune PostgreSQL for TimescaleDB
   when: postgresql.timescaledb.autotune and postgresql_timescaledb_install_apt_package.changed
-  command: timescaledb-tune -yes
+  changed_when: yes
+  ansible.builtin.command:
+    cmd: timescaledb-tune -yes
   notify: Restart PostgreSQL

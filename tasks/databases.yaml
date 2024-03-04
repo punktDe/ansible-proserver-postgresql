@@ -1,5 +1,6 @@
+---
 - name: Create databases
-  postgresql_db:
+  community.postgresql.postgresql_db:
     login_user: root
     maintenance_db: postgres
     name: "{{ item.value.name }}"
@@ -11,27 +12,31 @@
   loop_control:
     label: "{{ item.key }} name={{ item.value.name }} owner={{ owner }} encoding={{ encoding }} lc_collate={{ lc_collate }} lc_ctype={{ lc_ctype }} template={{ template }}"
   vars:
-    owner: "{{ none if item.value.owner|default(none) == none else (postgresql.users[item.value.owner[1:]].username if item.value.owner.startswith('~') else item.value.owner) }}"
-    encoding: "{{ item.value.encoding|default(postgresql.database_defaults.encoding, true) }}"
-    lc_collate: "{{ item.value.lc_collate|default(postgresql.database_defaults.lc_collate, true) }}"
-    lc_ctype: "{{ item.value.lc_ctype|default(postgresql.database_defaults.lc_ctype, true) }}"
-    template: "{{ item.value.template|default(postgresql.database_defaults.template, true) }}"
+    owner: "{{ none if item.value.owner | default(none) == none else (postgresql.users[item.value.owner[1:]].username if item.value.owner.startswith('~') else item.value.owner) }}"
+    encoding: "{{ item.value.encoding | default(postgresql.database_defaults.encoding, true) }}"
+    lc_collate: "{{ item.value.lc_collate | default(postgresql.database_defaults.lc_collate, true) }}"
+    lc_ctype: "{{ item.value.lc_ctype | default(postgresql.database_defaults.lc_ctype, true) }}"
+    template: "{{ item.value.template | default(postgresql.database_defaults.template, true) }}"
   with_dict: "{{ postgresql.databases }}"
   register: postgresql_createdb_result
 
-- block:
+- name: Handle database dumps and restoration
+  vars:
+    tmpfile: "/tmp/postgresql-{{ item.item.key }}.sql"
+  block:
     - name: Upload database dumps
-      copy:
+      ansible.builtin.copy:
         src: "{{ item.item.value.import_file }}"
         dest: "{{ tmpfile }}"
-        mode: 0600
+        mode: "0600"
+        owner: postgres
       when: item.changed and item.item.value.import_file|default(none)
       loop_control:
         label: "{{ tmpfile }}"
       with_items: "{{ postgresql_createdb_result.results }}"
 
     - name: Restore databases
-      postgresql_db:
+      community.postgresql.postgresql_db:
         login_user: root
         maintenance_db: postgres
         state: restore
@@ -41,6 +46,3 @@
       loop_control:
         label: "{{ item.item.value.name }} file={{ tmpfile }}"
       with_items: "{{ postgresql_createdb_result.results }}"
-
-  vars:
-    tmpfile: "/tmp/postgresql-{{ item.item.key }}.sql"

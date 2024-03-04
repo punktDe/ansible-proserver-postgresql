@@ -1,11 +1,12 @@
+---
 - name: Start PostgreSQL
-  service:
+  ansible.builtin.service:
     name: postgresql
     state: started
   register: postgresql_service_result
 
 - name: Restart PostgreSQL
-  service:
+  ansible.builtin.service:
     name: postgresql
     state: restarted
   when: not (postgresql_service_result is defined and postgresql_service_result.changed)
