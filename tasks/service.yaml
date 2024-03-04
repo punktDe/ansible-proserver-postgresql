@@ -1,11 +1,10 @@
+---
 - name: Enable PostgreSQL
-  loop:
-    - postgresql
-  service:
-    name: "{{ item }}"
+  ansible.builtin.service:
+    name: postgresql
     enabled: yes
 
 - name: Start PostgreSQL
-  service:
+  ansible.builtin.service:
     name: postgresql
     state: started

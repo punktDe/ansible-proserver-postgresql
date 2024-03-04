@@ -1,0 +1,14 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Get PostgreSQL version
+      register: psql_version
+      changed_when: no
+      ansible.builtin.command:
+        cmd: psql --version
+
+    - name: Display PostgreSQL version
+      ansible.builtin.debug:
+        var: psql_version.stdout

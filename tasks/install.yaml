@@ -1,38 +1,41 @@
-- when: ansible_os_family == 'Debian'
-  block:
-    - when: postgresql.repository.apt.repository
-      block:
-        - name: Add PostgreSQL repository key
-          apt_key:
-            url: "{{ postgresql.repository.apt.key_url }}"
+---
+- name: Install GPG
+  ansible.builtin.apt:
+    update_cache: yes
+    name:
+      - gpg
+      - gpg-agent
 
-        - name: Add PostgreSQL repository
-          loop:
-            - /etc/apt/sources.list.d/postgresql.list
-          copy:
-            content: |
-              {{ postgresql.repository.apt.repository }}
-            dest: "{{ item }}"
-          register: postgresql_add_apt_repository
+- name: Add PostgreSQL repository key
+  ansible.builtin.apt_key:
+    url: "{{ postgresql.repository.apt.key_url }}"
 
-        - name: Update apt cache
-          apt:
-            update_cache: yes
-          when: postgresql_add_apt_repository.changed
+- name: Install the PostgreSQL repository
+  ansible.builtin.copy:
+    content: "{{ postgresql.repository.apt.repository }}"
+    dest: "/etc/apt/sources.list.d/postgresql.list"
+    owner: "root"
+    mode: "0644"
+  register: postgresql_add_apt_repository
 
-    - name: Ensure data dir is mounted before PostgreSQL is started
-      loop:
-        - /etc/systemd/system/postgresql.service.d/UnitRequiresMountsFor.conf
-      ini_file:
-        path: "{{ item }}"
-        create: yes
-        section: Unit
-        option: RequiresMountsFor
-        value: /var/lib/postgresql
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  when: postgresql_add_apt_repository.changed
 
-    - name: Install PostgreSQL
-      apt:
-        name:
-          - "{{ postgresql.repository.apt.package }}"
-          - python3-psycopg2
-          - acl
+- name: Ensure data dir is mounted before PostgreSQL is started
+  community.general.ini_file:
+    path: "/etc/systemd/system/postgresql.service.d/UnitRequiresMountsFor.conf"
+    create: yes
+    section: Unit
+    option: RequiresMountsFor
+    value: /var/lib/postgresql
+    mode: "0644"
+    owner: "root"
+
+- name: Install PostgreSQL
+  ansible.builtin.apt:
+    name:
+      - "{{ postgresql.repository.apt.package }}"
+      - python3-psycopg2
+      - acl

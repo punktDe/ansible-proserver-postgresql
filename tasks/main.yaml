@@ -1,7 +1,24 @@
-- import_tasks: install.yaml
-- import_tasks: config.yaml
-- import_tasks: service.yaml
-- import_tasks: users.yaml
-- import_tasks: databases.yaml
-- import_tasks: timescaledb.yaml
-  when: postgresql.timescaledb.enabled
+---
+- name: Determine the PostgreSQL version (FreeBSD Proserver)
+  ansible.builtin.include_tasks: postgresql_version.yaml
+  when: ansible_system == 'FreeBSD'
+
+- name: Install PostgreSQL (Linux)
+  ansible.builtin.include_tasks: install.yaml
+  when: ansible_os_family == 'Debian'
+
+- name: Configure PostgreSQL
+  ansible.builtin.include_tasks: config.yaml
+
+- name: Install PostgreSQL service
+  ansible.builtin.include_tasks: service.yaml
+
+- name: Create PostgreSQL users
+  ansible.builtin.include_tasks: users.yaml
+
+- name: Create PostgreSQL databases
+  ansible.builtin.include_tasks: databases.yaml
+
+- name: Install TimescaleDB (Linux)
+  ansible.builtin.include_tasks: timescaledb.yaml
+  when: ansible_os_family == 'Debian' and postgresql.timescaledb.enabled

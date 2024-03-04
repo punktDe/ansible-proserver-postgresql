@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: all
+  environment:
+    GITHUB_ACTIONS: "maybe"
+  vars:
+    postgresql:
+      version: 16
+  tasks:
+    - name: "Include ansible-proserver-postgresql"
+      ansible.builtin.include_role:
+        name: "ansible-proserver-postgresql"
