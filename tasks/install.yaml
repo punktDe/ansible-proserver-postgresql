@@ -1,4 +1,11 @@
 ---
+- name: Install GPG
+  ansible.builtin.apt:
+    update_cache: yes
+    name:
+      - gpg
+      - gpg-agent
+
 - name: Add PostgreSQL repository key
   ansible.builtin.apt_key:
     url: "{{ postgresql.repository.apt.key_url }}"
