@@ -1,33 +1,30 @@
-- when: ansible_distribution == 'Ubuntu'
-  block:
-    - when: postgresql.timescaledb.repository.apt.repository
-      block:
-        - name: Add TimescaleDB repository key
-          apt_key:
-            url: "{{ postgresql.timescaledb.repository.apt.key_url }}"
+---
+- name: Add TimescaleDB repository key
+  apt_key:
+    url: "{{ postgresql.timescaledb.repository.apt.key_url }}"
 
-        - name: Add TimescaleDB repository
-          loop:
-            - /etc/apt/sources.list.d/timescaledb.list
-          copy:
-            content: |
-              {{ postgresql.timescaledb.repository.apt.repository }}
-            dest: "{{ item }}"
-          register: postgresql_timescaledb_add_apt_repository
+- name: Add TimescaleDB repository
+  loop:
+    - /etc/apt/sources.list.d/timescaledb.list
+  copy:
+    content: |
+      {{ postgresql.timescaledb.repository.apt.repository }}
+    dest: "{{ item }}"
+  register: postgresql_timescaledb_add_apt_repository
 
-        - name: Update apt cache
-          apt:
-            update_cache: yes
-          when: postgresql_timescaledb_add_apt_repository.changed
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: postgresql_timescaledb_add_apt_repository.changed
 
-    - name: Install TimescaleDB
-      apt:
-        name:
-          - "{{ postgresql.timescaledb.repository.apt.package }}"
-          - timescaledb-tools
-      register: postgresql_timescaledb_install_apt_package
+- name: Install TimescaleDB
+  apt:
+    name:
+      - "{{ postgresql.timescaledb.repository.apt.package }}"
+      - timescaledb-tools
+  register: postgresql_timescaledb_install_apt_package
 
-    - name: Tune PostgreSQL for TimescaleDB
-      when: postgresql.timescaledb.autotune and postgresql_timescaledb_install_apt_package.changed
-      command: timescaledb-tune -yes
-      notify: Restart PostgreSQL
+- name: Tune PostgreSQL for TimescaleDB
+  when: postgresql.timescaledb.autotune and postgresql_timescaledb_install_apt_package.changed
+  command: timescaledb-tune -yes
+  notify: Restart PostgreSQL

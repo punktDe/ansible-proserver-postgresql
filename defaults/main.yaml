@@ -1,10 +1,17 @@
+---
+postgresql_version: "{{ vars.postgresql.version }}"
 postgresql:
+  version: 13 # Is ignored on FreeBSD Proservers
   prefix:
     config: >-
       {%- if ansible_system == 'Linux' -%}
-        /etc/postgresql/13/main/conf.d
+        /etc/postgresql/{{ postgresql_version }}/main/conf.d
       {%- elif ansible_system == 'FreeBSD' -%}
-       /var/db/postgresql/data13
+        {%- if postgresql_version == "15" -%}
+           /var/db/postgres/data{{ postgresql_version }}
+        {%- else -%}
+           /var/db/postgresql/data{{ postgresql_version }}
+        {%- endif -%}
       {%- else -%}
         /usr/local/etc/main/conf.d
       {%- endif -%}
@@ -25,7 +32,7 @@ postgresql:
       key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
       repository: |
         deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main
-      package: postgresql-13
+      package: postgresql-{{ postgresql_version }}
   timescaledb:
     enabled: no
     autotune: yes
@@ -34,4 +41,4 @@ postgresql:
         key_url: https://packagecloud.io/timescale/timescaledb/gpgkey
         repository: |
           deb https://packagecloud.io/timescale/timescaledb/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} main
-        package: timescaledb-2-postgresql-13
+        package: timescaledb-2-postgresql-{{ postgresql_version }}
