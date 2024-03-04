@@ -4,11 +4,10 @@
   gather_facts: false
   tasks:
     - name: Get PostgreSQL version
-      register: psql_version
-      changed_when: no
+      regsiter: psql_version
       ansible.builtin.command:
         cmd: psql --version
 
     - name: Display PostgreSQL version
-      ansible.builtin.debug:
+      debug:
         var: psql_version.stdout
