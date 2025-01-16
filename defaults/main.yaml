@@ -1,6 +1,7 @@
 ---
+postgresql_version: "{{ ansible_local.postgresql.version }}"
 postgresql:
-  version: "{{ ansible_local.postgresql.version }}"
+  version: "{{ postgresql_version }}"
   prefix: "{{ ansible_local.postgresql.prefix }}"
   users: {}
   privileges: {}
