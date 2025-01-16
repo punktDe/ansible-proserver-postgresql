@@ -1,8 +1,8 @@
 ---
-postgresql_version: "{{ ansible_local.postgresql.version }}"
+postgresql_version: "{{ ansible_local.postgresql.version | default(16) }}"
 postgresql:
   version: "{{ postgresql_version }}"
-  prefix: "{{ ansible_local.postgresql.prefix }}"
+  prefix: "{{ ansible_local.postgresql.prefix | default('') }}"
   users: {}
   privileges: {}
   databases:

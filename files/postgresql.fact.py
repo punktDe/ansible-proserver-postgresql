@@ -32,12 +32,12 @@ class PostgresqlFacts:
         if os_family == "debian":
             command='apt-cache search --names-only "^postgresql-[0-9]+$" | grep -Po "[0-9]+"'
         else:
-            command='psql --version | sed "s/^.*\\([0-9][0-9]\\).*$/\1/"'
+            command='psql --version | sed "s/^.*\\([0-9][0-9]\\).*$/\\1/"'
         command_output = subprocess.run(command, shell=True, capture_output=True)
         if len(command_output.stdout) > 0:
             return int(command_output.stdout.decode().strip())
         else:
-            raise OSError(f"Error detecting the PostgreSQL version: command_output.stderr.decode()")
+            raise OSError(f"Error detecting the PostgreSQL version: {command_output.stderr.decode()}")
 
     def get_postgresql_dbdir(self) -> str:
         os_family = self.get_os_family()
@@ -46,9 +46,9 @@ class PostgresqlFacts:
             dbdir = f"/etc/postgresql/{version}/main/conf.d"
         else:
             if version >= 15:
-                dbdir = "/var/db/postgres/data{version}"
+                dbdir = f"/var/db/postgres/data{version}"
             else:
-                dbdir = "/var/db/postgresql/data{version}"
+                dbdir = f"/var/db/postgresql/data{version}"
         return dbdir
 
     def generate_postgresql_facts(self) -> dict:
