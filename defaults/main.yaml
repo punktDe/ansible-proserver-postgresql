@@ -7,7 +7,7 @@ postgresql:
       {%- if ansible_system == 'Linux' -%}
         /etc/postgresql/{{ postgresql_version }}/main/conf.d
       {%- elif ansible_system == 'FreeBSD' -%}
-        {%- if postgresql_version == "15" -%}
+        {%- if postgresql_version is version("15", ">=") -%}
            /var/db/postgres/data{{ postgresql_version }}
       {%- else -%}
            /var/db/postgresql/data{{ postgresql_version }}
