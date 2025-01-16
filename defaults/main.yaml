@@ -1,20 +1,8 @@
 ---
-postgresql_version: "{{ vars.postgresql.version }}"
+postgresql_version: "{{ ansible_local.postgresql.version | default(16) }}"
 postgresql:
-  version: 13 # Is ignored on FreeBSD Proservers
-  prefix:
-    config: >-
-      {%- if ansible_system == 'Linux' -%}
-        /etc/postgresql/{{ postgresql_version }}/main/conf.d
-      {%- elif ansible_system == 'FreeBSD' -%}
-        {%- if postgresql_version == "15" -%}
-           /var/db/postgres/data{{ postgresql_version }}
-      {%- else -%}
-           /var/db/postgresql/data{{ postgresql_version }}
-      {%- endif -%}
-      {%- else -%}
-        /usr/local/etc/main/conf.d
-      {%- endif -%}
+  version: "{{ postgresql_version }}"
+  prefix: "{{ ansible_local.postgresql.prefix | default('') }}"
   users: {}
   privileges: {}
   databases:

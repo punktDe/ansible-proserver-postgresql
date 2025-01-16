@@ -1,0 +1,33 @@
+---
+- name: Update apt cache (Debian-based)
+  changed_when: no
+  check_mode: no
+  when: "ansible_os_family == 'Debian'"
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Create directory for Ansible facts
+  loop:
+    - "/etc/ansible"
+    - "/etc/ansible/facts.d"
+  check_mode: no
+  ansible.builtin.file:
+    mode: "0755"
+    owner: root
+    path: "{{ item }}"
+    state: directory
+
+- name: Template PostrgreSQL facts
+  check_mode: no
+  ansible.builtin.copy:
+    owner: root
+    src: postgresql.fact.py
+    dest: "/etc/ansible/facts.d/postgresql.fact"
+    mode: a+x
+  register: postgresql_template_fact_result
+
+- name: Reload facts
+  check_mode: no
+  when: postgresql_template_fact_result.changed
+  changed_when: yes
+  ansible.builtin.setup: {}
