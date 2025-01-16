@@ -1,7 +1,6 @@
 ---
-- name: Determine the PostgreSQL version (FreeBSD Proserver)
-  ansible.builtin.include_tasks: postgresql_version.yaml
-  when: ansible_system == 'FreeBSD'
+- name: Set the PostgreSQL facts
+  ansible.builtin.include_tasks: postgresql_fact.yaml
 
 - name: Install PostgreSQL (Linux)
   ansible.builtin.include_tasks: install.yaml
