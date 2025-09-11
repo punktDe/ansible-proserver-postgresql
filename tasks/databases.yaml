@@ -42,7 +42,7 @@
         state: restore
         target: "{{ tmpfile }}"
         name: "{{ item.item.value.name }}"
-      when: item.changed and item.item.value.import_file|default(none)
+      when: item.changed and item.item.value.import_file | default(False)
       loop_control:
         label: "{{ item.item.value.name }} file={{ tmpfile }}"
       with_items: "{{ postgresql_createdb_result.results }}"
