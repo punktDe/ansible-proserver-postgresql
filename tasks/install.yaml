@@ -13,7 +13,7 @@
     state: absent
 
 
-- name: Add the elasticsearch apt repository
+- name: Add the PostgreSQL apt repository
   register: postgresql_add_apt_repository
   ansible.builtin.deb822_repository:
     name: postgresql
