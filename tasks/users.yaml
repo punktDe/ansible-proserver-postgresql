@@ -1,3 +1,4 @@
+---
 - name: Create root user
   become: yes
   become_user: postgres

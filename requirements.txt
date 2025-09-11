@@ -1,6 +1,8 @@
 ansible
-docker
-molecule
-molecule-plugins
 ansible-lint
+docker
+molecule<25.2.0
+molecule-plugins
 yamllint
+requests
+aar-doc
