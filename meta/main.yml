@@ -1,10 +1,9 @@
 ---
-dependencies: []
-
 galaxy_info:
-  author: "Punkt.de"
+  author: "punkt.de"
   license: "MIT"
-  description: "Postgresql role for Proserver"
-  role_name: "proserver_postgresql"
+  role_name: postgresql
+  description: "postgresql role for Proserver"
   namespace: "punktde"
   min_ansible_version: "2.15"
+  platforms: []

@@ -1,77 +1,37 @@
-# [proserver-ansible-postgresql](https://github.com/punktDe/proserver-ansible-postgresql)
+<!-- BEGIN_ANSIBLE_DOCS -->
+# ansible-proserver-postgresql
 
-Ansible role to configure PostgreSQL on a proServer.
+postgresql role for Proserver
 
-## Requirements
+## Supported Operating Systems
 
-- A proServer
-- Ansible >=2.6.4
-- Ansible option `hash_behaviour` set to `merge`
+- Debian 12
+- Ubuntu 24.04, 22.04
+- FreeBSD [Proserver](https://infrastructure.punkt.de/de/produkte/proserver.html)
 
-## Configuration
+## Role Arguments
 
-**1)** Add the role to your playbook.
-You could add this repository as submodule to your Ansible project's Git repository.
+This entrypoint has no options.
 
+## Dependencies
+None.
+
+## Installation
+Add this role to the requirements.yml of your playbook as follows:
+```yaml
+roles:
+  - name: ansible-proserver-postgresql
+    src: https://github.com/punktDe/ansible-proserver-postgresql
 ```
-git submodule add https://github.com/punktDe/proserver-ansible-postgresql.git roles/postgresql
-```
+
+Afterwards, install the role by running `ansible-galaxy install -r requirements.yml`
+
+## Example Playbook
 
 ```yaml
-- name: postgresql
-  hosts: all
-  become: yes
+- hosts: all
   roles:
-    - postgresql
+    - name: postgresql
 ```
 
-**2)** Configure which databases and users you'd like to have (in host vars, group vars or wherever).
-
-```yaml
-postgresql:
-  databases:
-    cms:
-      name: mydb
-      # "~cms" will have the same effect as "myuser" in this scenario
-      owner: ~cms
-  users:
-    cms:
-      username: myuser
-      password: mypass
-```
-
-With these variables the role will ensure that
-
-- there is a database `mydb`
-- there is a user `myuser@localhost` with password `mypass`
-- `myuser` will be the owner of `mydb`
-
-The value `cms_all` is never used and `cms` is only used for the quick user
-reference feature (`~cms`).
-You can use those keys to override previously defined variables
-(e.g. override options from group vars in host vars).
-
-## Full example
-
-This example shows all available variables.
-
-```yaml
-postgresql:
-  database_defaults:
-    encoding: UTF-8
-    lc_collate: en_US.UTF-8
-    lc_ctype: en_US.UTF-8
-    template: template0
-  databases:
-    example_db:
-      encoding: UTF-8
-      lc_collate: de_DE.UTF-8
-      lc_ctype: de_DE.UTF-8
-      template: template1
-      name: example
-      owner: example
-  users:
-    example_user:
-      username: example
-      password: example
-```
+<!-- END_ANSIBLE_DOCS -->

@@ -31,7 +31,9 @@ postgresql:
     apt:
       key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
       repository: |
-        deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main
+        http://apt.postgresql.org/pub/repos/apt
+      suites:
+        - "{{ ansible_distribution_release }}-pgdg"
       package: postgresql-{{ postgresql_version }}
   timescaledb:
     enabled: no

@@ -1,4 +1,19 @@
 ---
+
+- name: Generate PostgreSQL locales
+  loop: "{{ postgresql.databases | dict2items }}"
+  register: postgresql_locales_generated
+  community.general.locale_gen:
+    name:
+      - "{{ item.value.lc_collate | default(postgresql.database_defaults.lc_collate, true) }}"
+      - "{{ item.value.lc_ctype | default(postgresql.database_defaults.lc_ctype, true) }}"
+
+- name: Restart PostgreSQL
+  when: postgresql_locales_generated.changed
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+
 - name: Create databases
   community.postgresql.postgresql_db:
     login_user: root
@@ -17,7 +32,7 @@
     lc_collate: "{{ item.value.lc_collate | default(postgresql.database_defaults.lc_collate, true) }}"
     lc_ctype: "{{ item.value.lc_ctype | default(postgresql.database_defaults.lc_ctype, true) }}"
     template: "{{ item.value.template | default(postgresql.database_defaults.template, true) }}"
-  with_dict: "{{ postgresql.databases }}"
+  loop: "{{ postgresql.databases | dict2items }}"
   register: postgresql_createdb_result
 
 - name: Handle database dumps and restoration
@@ -30,7 +45,7 @@
         dest: "{{ tmpfile }}"
         mode: "0600"
         owner: postgres
-      when: item.changed and item.item.value.import_file|default(none)
+      when: item.changed and item.item.value.import_file | default(False)
       loop_control:
         label: "{{ tmpfile }}"
       with_items: "{{ postgresql_createdb_result.results }}"
@@ -42,7 +57,7 @@
         state: restore
         target: "{{ tmpfile }}"
         name: "{{ item.item.value.name }}"
-      when: item.changed and item.item.value.import_file|default(none)
+      when: item.changed and item.item.value.import_file | default(False)
       loop_control:
         label: "{{ item.item.value.name }} file={{ tmpfile }}"
       with_items: "{{ postgresql_createdb_result.results }}"
