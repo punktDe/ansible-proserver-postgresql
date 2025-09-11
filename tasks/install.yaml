@@ -1,22 +1,29 @@
 ---
-- name: Install GPG
+- name: Install dependencies
   ansible.builtin.apt:
-    update_cache: yes
     name:
+      - python3-debian
       - gpg
       - gpg-agent
+    update_cache: yes
 
-- name: Add PostgreSQL repository key
-  ansible.builtin.apt_key:
-    url: "{{ postgresql.repository.apt.key_url }}"
+- name: Remove the legacy apt repository
+  ansible.builtin.file:
+    dest: /etc/apt/sources.list.d/postgresql.list
+    state: absent
 
-- name: Install the PostgreSQL repository
-  ansible.builtin.copy:
-    content: "{{ postgresql.repository.apt.repository }}"
-    dest: "/etc/apt/sources.list.d/postgresql.list"
-    owner: "root"
-    mode: "0644"
+
+- name: Add the elasticsearch apt repository
   register: postgresql_add_apt_repository
+  ansible.builtin.deb822_repository:
+    name: postgresql
+    uris: "{{ postgresql.repository.apt.repository }}"
+    signed_by: "{{ postgresql.repository.apt.key_url }}"
+    types: [deb]
+    components: [main]
+    suites: [stable]
+    state: present
+    enabled: yes
 
 - name: Update apt cache
   ansible.builtin.apt:
