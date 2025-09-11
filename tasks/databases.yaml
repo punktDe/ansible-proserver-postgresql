@@ -30,7 +30,7 @@
         dest: "{{ tmpfile }}"
         mode: "0600"
         owner: postgres
-      when: item.changed and item.item.value.import_file|default(none)
+      when: item.changed and item.item.value.import_file | default(False)
       loop_control:
         label: "{{ tmpfile }}"
       with_items: "{{ postgresql_createdb_result.results }}"
