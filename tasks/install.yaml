@@ -21,7 +21,7 @@
     signed_by: "{{ postgresql.repository.apt.key_url }}"
     types: [deb]
     components: [main]
-    suites: [stable]
+    suites: "{{ postgresql.repository.apt.suites }}"
     state: present
     enabled: yes
 
