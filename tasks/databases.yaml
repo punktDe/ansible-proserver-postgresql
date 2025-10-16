@@ -1,19 +1,5 @@
 ---
 
-- name: Generate PostgreSQL locales
-  loop: "{{ postgresql.databases | dict2items }}"
-  register: postgresql_locales_generated
-  community.general.locale_gen:
-    name:
-      - "{{ item.value.lc_collate | default(postgresql.database_defaults.lc_collate, true) }}"
-      - "{{ item.value.lc_ctype | default(postgresql.database_defaults.lc_ctype, true) }}"
-
-- name: Restart PostgreSQL
-  when: postgresql_locales_generated.changed
-  ansible.builtin.service:
-    name: postgresql
-    state: restarted
-
 - name: Create databases
   community.postgresql.postgresql_db:
     login_user: root
