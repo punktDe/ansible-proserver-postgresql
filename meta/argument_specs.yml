@@ -1,0 +1,165 @@
+---
+argument_specs:
+  main:
+    short_description: Main entry point for the PostgreSQL role
+    options:
+      postgresql:
+        type: "dict"
+        options:
+          version:
+            type: "int"
+            default: 13
+            description:
+              - Major version of PostgreSQL to install/configure.
+              - Ignored on FreeBSD Proservers (version is determined by the system).
+          prefix:
+            type: "dict"
+            options:
+              config:
+                type: "str"
+                description:
+                  - Directory for PostgreSQL configuration (e.g. pg_hba.conf, postgresql.conf include).
+                  - Defaults depend on system; see defaults/main.yaml (e.g. /etc/postgresql/{{ version }}/main/conf.d on Linux).
+          users:
+            type: "dict"
+            default: {}
+            description:
+              - Dict of PostgreSQL users to create (key is an arbitrary id, value defines the user).
+            options:
+              username:
+                type: "str"
+                description: Login name of the user.
+              password:
+                type: "str"
+                description: Password for the user (optional).
+              role_attributes:
+                type: "dict"
+                description: Role attributes (e.g. SUPERUSER, CREATEROLE); values are joined for role_attr_flags.
+              hosts:
+                type: "list"
+                elements: "str"
+                description:
+                  - List of client addresses (e.g. 127.0.0.1) for which a pg_hba.conf host entry is added.
+                  - Used together with privileges to allow password authentication from those hosts.
+          privileges:
+            type: "dict"
+            default: {}
+            description:
+              - Dict of privileges to assign (key is arbitrary id). Each entry grants a role access to a database or object.
+            options:
+              username:
+                type: "str"
+                description: Role name to grant the privilege to.
+              database:
+                type: "str"
+                description: Database the privilege applies to.
+              type:
+                type: "str"
+                default: "table"
+                description: Type of object (e.g. table, database, schema).
+              objs:
+                type: "str"
+                description: Object name(s) for the grant (optional for type database).
+              schema:
+                type: "str"
+                description: Schema name (optional).
+              privs:
+                type: "list"
+                elements: "str"
+                description: List of privilege names (e.g. ALL, SELECT, INSERT).
+          databases:
+            type: "dict"
+            description:
+              - Dict of databases to create (key is arbitrary id). At least the root database entry is required by defaults.
+            options:
+              name:
+                type: "str"
+                description: Name of the database.
+              owner:
+                type: "str"
+                description:
+                  - Owner of the database. Use ~<user_key> to reference a user from postgresql.users by key (e.g. ~molecule).
+              encoding:
+                type: "str"
+                description: Character encoding (defaults to database_defaults.encoding).
+              lc_collate:
+                type: "str"
+                description: Locale for collation order (defaults to database_defaults.lc_collate).
+              lc_ctype:
+                type: "str"
+                description: Locale for character classification (defaults to database_defaults.lc_ctype).
+              template:
+                type: "str"
+                description: Template database to use (defaults to database_defaults.template).
+              import_file:
+                type: "path"
+                description: Path to a dump file to restore into the database after creation (optional).
+          database_defaults:
+            type: "dict"
+            options:
+              encoding:
+                type: "str"
+                default: UTF-8
+              lc_collate:
+                type: "str"
+                default: en_US.UTF-8
+              lc_ctype:
+                type: "str"
+                default: en_US.UTF-8
+              template:
+                type: "str"
+                default: template0
+            description: Defaults applied to database creation when not set per-database.
+          postgresql.conf:
+            type: "dict"
+            default: {}
+            description:
+              - Key-value options written to the role-managed include file (ansible.conf), included from postgresql.conf.
+              - Consult PostgreSQL documentation for valid settings.
+          repository:
+            type: "dict"
+            description: Package repository used to install PostgreSQL (Linux/Debian).
+            options:
+              apt:
+                type: "dict"
+                options:
+                  key_url:
+                    type: "str"
+                    default: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+                  repository:
+                    type: "str"
+                    description: APT repository URI (default uses apt.postgresql.org).
+                  suites:
+                    type: "list"
+                    elements: "str"
+                    description: Suite(s) for the repo (default uses distribution release and -pgdg).
+                  package:
+                    type: "str"
+                    description: Package name (defaults to postgresql-{{ postgresql.version }}).
+          timescaledb:
+            type: "dict"
+            options:
+              enabled:
+                type: "bool"
+                default: false
+                description: Whether to install and enable TimescaleDB.
+              autotune:
+                type: "bool"
+                default: true
+                description: Whether to run timescaledb-tune after installation.
+              repository:
+                type: "dict"
+                options:
+                  apt:
+                    type: "dict"
+                    options:
+                      key_url:
+                        type: "str"
+                        description: GPG key URL for the TimescaleDB repo.
+                      repository:
+                        type: "str"
+                        description: APT repository line(s) for TimescaleDB.
+                      package:
+                        type: "str"
+                        description: Package name (e.g. timescaledb-2-postgresql-{{ postgresql.version }}).
+            description: TimescaleDB installation and tuning (Linux/Debian only).
