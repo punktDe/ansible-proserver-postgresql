@@ -1,12 +1,12 @@
 ---
-postgresql_version: "{{ vars.postgresql.version }}"
+postgresql_version: "{{ postgresql.version }}"
 postgresql:
   version: 13 # Is ignored on FreeBSD Proservers
   prefix:
     config: >-
-      {%- if ansible_system == 'Linux' -%}
+      {%- if ansible_facts['system'] == 'Linux' -%}
         /etc/postgresql/{{ postgresql_version }}/main/conf.d
-      {%- elif ansible_system == 'FreeBSD' -%}
+      {%- elif ansible_facts['system'] == 'FreeBSD' -%}
         {%- if postgresql_version is version("15", ">=") -%}
            /var/db/postgres/data{{ postgresql_version }}
       {%- else -%}
@@ -33,7 +33,7 @@ postgresql:
       repository: |
         http://apt.postgresql.org/pub/repos/apt
       suites:
-        - "{{ ansible_distribution_release }}-pgdg"
+        - "{{ ansible_facts['distribution_release'] }}-pgdg"
       package: postgresql-{{ postgresql_version }}
   timescaledb:
     enabled: no

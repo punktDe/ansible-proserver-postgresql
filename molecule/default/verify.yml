@@ -2,6 +2,10 @@
 - name: Verify
   hosts: all
   gather_facts: false
+  vars:
+    pg_database: molecule
+    pg_user: molecule
+    pg_password: supersecretpassword
   tasks:
     - name: Get PostgreSQL version
       register: psql_version
@@ -12,3 +16,36 @@
     - name: Display PostgreSQL version
       ansible.builtin.debug:
         var: psql_version.stdout
+
+    - name: Verify molecule database exists (connect as molecule with password)
+      ansible.builtin.shell: |
+        PGPASSWORD={{ pg_password }} psql -U {{ pg_user }} -d {{ pg_database }} -h localhost -c "SELECT 1"
+      register: db_connect
+      changed_when: false
+      no_log: true
+
+    - name: Test write as molecule user (create table and insert)
+      ansible.builtin.shell: |
+        PGPASSWORD={{ pg_password }} psql -U {{ pg_user }} -d {{ pg_database }} -h localhost -c "CREATE TABLE verify_rw_test (id serial primary key, data text); INSERT INTO verify_rw_test (data) VALUES ('molecule verify');"
+      register: write_test
+      changed_when: false
+      no_log: true
+
+    - name: Test read as molecule user
+      ansible.builtin.shell: |
+        PGPASSWORD={{ pg_password }} psql -U {{ pg_user }} -d {{ pg_database }} -h localhost -t -c "SELECT data FROM verify_rw_test WHERE data = 'molecule verify';"
+      register: read_test
+      changed_when: false
+      no_log: true
+
+    - name: Assert read returned expected data
+      ansible.builtin.assert:
+        that: "'molecule verify' in read_test.stdout"
+        fail_msg: "molecule user could not read expected row"
+        success_msg: "molecule user read back expected data"
+
+    - name: Clean up verify test table
+      ansible.builtin.shell: |
+        PGPASSWORD={{ pg_password }} psql -U {{ pg_user }} -d {{ pg_database }} -h localhost -c "DROP TABLE verify_rw_test;"
+      changed_when: false
+      no_log: true

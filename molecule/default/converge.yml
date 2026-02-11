@@ -4,6 +4,16 @@
   environment:
     GITHUB_ACTIONS: "maybe"
     ANSIBLE_HASH_BEHAVIOUR: merge
+  vars:
+    postgresql:
+      databases:
+        molecule:
+          name: molecule
+          owner: ~molecule
+      users:
+        molecule:
+          username: molecule
+          password: supersecretpassword
   tasks:
     - name: "Include ansible-proserver-postgresql"
       ansible.builtin.include_role:
