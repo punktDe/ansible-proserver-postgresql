@@ -42,5 +42,5 @@ postgresql:
       apt:
         key_url: https://packagecloud.io/timescale/timescaledb/gpgkey
         repository: |
-          deb https://packagecloud.io/timescale/timescaledb/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} main
+          deb https://packagecloud.io/timescale/timescaledb/{{ ansible_facts['distribution'] | lower }}/ {{ ansible_facts['distribution_release'] }} main
         package: timescaledb-2-postgresql-{{ postgresql_version }}
